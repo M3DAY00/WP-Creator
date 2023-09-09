@@ -9,4 +9,6 @@ Il n'est pas mis à jour en temps réel.
 ## But
 Le but de ce projet est de créer automatiquement des plans de travail
 
+---
+
 **Ce projet est encore sous développement.** 
