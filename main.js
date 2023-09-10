@@ -1,4 +1,4 @@
-function Main() {
+function doGet() {
 
   var files = DriveApp.getFilesByName("Paramétrage (M3DAY00-AS)");
   
@@ -42,7 +42,7 @@ function Main() {
     sheet3.setName("Groupes");
     sheet3.getRange("A1").setValue("Groupes");
     sheet3.getRange("A:A").setHorizontalAlignment("center");
-
+    return "Un Google Spreadsheet à été créé. Veuillez remplir les données pour créer les documents.\nLe Spreadsheet est disponible à l'addresse suivante : " + createdSheet.getUrl()
   } else {
     if (sSheet.getSheets().length == 3) {
       if (sheet1.getRange("B2").getValue() != "" && sheet1.getRange("B3").getValue() != "" && sheet2.getRange("A2").getValue() != "" && sheet3.getRange("A2").getValue() != "") {
@@ -99,9 +99,15 @@ function Main() {
         sheet4.getRange("A19").setHorizontalAlignment("right");
         sheet4.deleteColumn(sheet4.getMaxColumns())
       }
+      else {
+        return "Le script n'a pas été en mesure de créer une plage pour assigner les jours aux groupes puisque vous n\'avez pas remplis les cases nécessaires au fonctionnement."
+      }
     }
     else if (sSheet.getSheets().length == 4) {
       CreateDoc()
+    }
+    else {
+      return "La structure du Google Spreadsheet à été modifiés et ne peut donc pas être pris en charge. Veuillez sauvegarder vos données, supprimer le Google Spreadsheet et de revenir sur rafraichir cette page."
     }
   }
 }
@@ -162,6 +168,7 @@ function CreateDoc() {
     }
     doc0.saveAndClose();
   }
+  return "Les documents ont été complétés. Visiter Google Docs pour les voirs et les modifiés!"
 }
 
 function FormatD(dateToFormat) {
