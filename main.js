@@ -106,29 +106,6 @@ function Main() {
   }
 }
 
-  /*
-  var docId = PropertiesService.getUserProperties().getProperty('DOC_ID');
-  if(!docId)
-  {
-    var createDoc = DocumentApp.create('PT');
-    PropertiesService.getUserProperties().setProperty('DOC_ID', createDoc.getId());
-    docId = createDoc.getId();
-  }
-  Logger.log(docId);
-  var doc = DocumentApp.openById(docId);
-  var body = doc.getBody();
-
-  var date = new Date()
-  if(date.getDay() != 6 || date.getDay() != 0)
-  {
-    var table = body.getTables()[0];
-    var newRow = table.appendTableRow();
-    newRow.appendTableCell(FormatD());
-    newRow.appendTableCell('');
-    newRow.appendTableCell('');
-  }
-  */
-
 function CreateDoc() {
   var files = DriveApp.getFilesByName("Paramétrage (M3DAY00-AS)");
   while (files.hasNext()) {
@@ -139,37 +116,51 @@ function CreateDoc() {
   }
   var sheetId = sSheet.getId();
   var sSheet = SpreadsheetApp.openById(sheetId);
-  var startC = sheets[0].getRange("B2").getValue();
-  var endC = sheets[0].getRange("B3").getValue();
-  var stopDayCs = sheets[1].getRange("A2:A").getValues();
   var groupsInt = sheets[3].getMaxColumns() - 1;
   var groups = {}
-  for (var i = 1; i <= groupsInt; i++)  {
-    var groupNo = sheets[3].getRange(1, i + 1).getValue()
+  for (var a = 1; a <= groupsInt; a++) {
+    var groupNo = sheets[3].getRange(1, a + 1).getValue()
     groups[groupNo] = []
     for (j = 2; j <= 19; j++) {
-      groups[groupNo][j - 2] = sheets[3].getRange(j, i + 1).getValue()
+      groups[groupNo][j - 2] = sheets[3].getRange(j, a + 1).getValue()
     }
-    var doc0 = DocumentApp.create(groupNo + " PT")
-    var body0 = doc0.getBody()
-    for (var i = new Date(sheets[0].getRange("B2").getValue()); i <= Date(sheets[0].getRange("B3").getValue()); i++)
-      if(i.getDay() != 6 || i.getDay() != 0) {
+    var doc0 = DocumentApp.create(groupNo + " PT");
+    var body0 = doc0.getBody();
+    body0.appendTable([["", "Pendant le cours", "Devoir(s)"]]);
+    var day = 18;
+    var daysFromStart = 0;
+    for (var i = new Date(sheets[0].getRange("B2").getValue()); i <= new Date(sheets[0].getRange("B3").getValue()); i.setDate(i.getDate() + 1))
+    {
+      if(i.getDay() > 0 && i.getDay() < 6) {
         isDayOff = false
         for (var x = 2; x <= sheets[1].getMaxRows(); x++) {
-          dateCheck = new Date(sheets[1].getRange(x, 1).getValue())
+          if (sheets[1].getRange(x, 1).getValue() == "") {
+            break;
+          }
+          dateCheck = new Date(sheets[1].getRange(x, 1).getValue());
           if (dateCheck == i) {
-            isDayOff = true
-            break
+            isDayOff = true;
+            break;
           }
         }
         if (isDayOff == false) {
-          var table = body0.getTables()[0];
-          var newRow = table.appendTableRow();
-          newRow.appendTableCell(FormatD(i));
-          newRow.appendTableCell('');
-          newRow.appendTableCell('');
+          if (day > 17) {
+            day = 0
+          } else {
+            day++;
+          }
+          if (groups[groupNo][day] != "") {
+            daysFromStart++;
+            var table = body0.getTables()[0];
+            var newRow = table.appendTableRow();
+            newRow.appendTableCell("Cours " + daysFromStart + "\n\n" + FormatD(i));
+            newRow.appendTableCell('');
+            newRow.appendTableCell('');
+          }
         }
       }
+    }
+    doc0.saveAndClose();
   }
 }
 
@@ -206,7 +197,7 @@ function FormatD(dateToFormat) {
   }
   else if(date.getMonth() == 7)
   {
-    strMonth = "aout"
+    strMonth = "août"
   }
   else if(date.getMonth() == 8)
   {
@@ -224,6 +215,21 @@ function FormatD(dateToFormat) {
   {
     strMonth = "décembre"
   }
+  if (date.getDay() == 0) {
+    strDay = "Dimanche";
+  } else if (date.getDay() == 1) {
+    strDay = "Lundi";
+  } else if (date.getDay() == 2) {
+    strDay = "Mardi";
+  } else if (date.getDay() == 3) {
+    strDay = "Mercredi";
+  } else if (date.getDay() == 4) {
+    strDay = "Jeudi";
+  } else if (date.getDay() == 5) {
+    strDay = "Vendredi";
+  } else if (date.getDay() == 6) {
+    strDay = "Samedi";
+  } 
   dayOfMonth = date.getDate()
-  return dayOfMonth + " " + strMonth
+  return strDay + "\n" + dayOfMonth + " " + strMonth
 }
