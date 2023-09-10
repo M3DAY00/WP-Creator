@@ -106,6 +106,29 @@ function Main() {
   }
 }
 
+  /*
+  var docId = PropertiesService.getUserProperties().getProperty('DOC_ID');
+  if(!docId)
+  {
+    var createDoc = DocumentApp.create('PT');
+    PropertiesService.getUserProperties().setProperty('DOC_ID', createDoc.getId());
+    docId = createDoc.getId();
+  }
+  Logger.log(docId);
+  var doc = DocumentApp.openById(docId);
+  var body = doc.getBody();
+
+  var date = new Date()
+  if(date.getDay() != 6 || date.getDay() != 0)
+  {
+    var table = body.getTables()[0];
+    var newRow = table.appendTableRow();
+    newRow.appendTableCell(FormatD());
+    newRow.appendTableCell('');
+    newRow.appendTableCell('');
+  }
+  */
+
 function CreateDoc() {
   var files = DriveApp.getFilesByName("Paramétrage (M3DAY00-AS)");
   while (files.hasNext()) {
@@ -129,19 +152,25 @@ function CreateDoc() {
     }
     var doc0 = DocumentApp.create(groupNo + " PT")
     var body0 = doc0.getBody()
-    var date = new Date()
-    if (date < Date())
-    for (var i = new Date(); i < Date(sheets[0].getRange("A2").getValue()); i++)
-      if(date.getDay() != 6 || date.getDay() != 0) {
-        for (var x = 0; x < 0; i++)
-        var table = body0.getTables()[0];
-        var newRow = table.appendTableRow();
-        newRow.appendTableCell(FormatD(i));
-        newRow.appendTableCell('');
-        newRow.appendTableCell('');
+    for (var i = new Date(sheets[0].getRange("B2").getValue()); i <= Date(sheets[0].getRange("B3").getValue()); i++)
+      if(i.getDay() != 6 || i.getDay() != 0) {
+        isDayOff = false
+        for (var x = 2; x <= sheets[1].getMaxRows(); x++) {
+          dateCheck = new Date(sheets[1].getRange(x, 1).getValue())
+          if (dateCheck == i) {
+            isDayOff = true
+            break
+          }
+        }
+        if (isDayOff == false) {
+          var table = body0.getTables()[0];
+          var newRow = table.appendTableRow();
+          newRow.appendTableCell(FormatD(i));
+          newRow.appendTableCell('');
+          newRow.appendTableCell('');
+        }
       }
   }
-  Logger.log(groups)
 }
 
 function FormatD(dateToFormat) {
